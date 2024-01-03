@@ -4,7 +4,7 @@
 // Create a RenderTexture with enableRandomWrite flag and set it
 // with cs.SetTexture
 
-static const int layerCounts[4] = { 9,8,6,5 };
+static const int layerCounts[3] = { 9,7,5 };
 static const int brainCount = 1;
 
 struct Neuron
@@ -22,13 +22,13 @@ struct Pathway
 
 struct Brain 
 {
-	Neuron neurons[layerCounts[0] + layerCounts[1] + layerCounts[2] + layerCounts[3]];
+	Neuron neurons[layerCounts[0] + layerCounts[1] + layerCounts[2]];
 	
-	Pathway paths[layerCounts[0] * layerCounts[1] + layerCounts[1] * layerCounts[2] + layerCounts[2] * layerCounts[3]];
+	Pathway paths[layerCounts[0] * layerCounts[1] + layerCounts[1] * layerCounts[2]];
 
 	void ClearNeuronValues()
 	{
-		for (int i = 0; i < (layerCounts[1] + layerCounts[2] + layerCounts[3]); i++)
+		for (int i = 0; i < (layerCounts[1] + layerCounts[2]); i++)
 		{
 			neurons[layerCounts[0] + i].value = 0.0f;
 		}
@@ -37,7 +37,7 @@ struct Brain
 
 RWStructuredBuffer<Brain> buffBrain;
 
-[numthreads(layerCounts[0] * layerCounts[1] + layerCounts[1] * layerCounts[2] + layerCounts[2] * layerCounts[3], brainCount,1)]
+[numthreads(layerCounts[0] * layerCounts[1] + layerCounts[1] * layerCounts[2], brainCount,1)]
 void CSMain (uint3 id : SV_DispatchThreadID)
 {
 	int inInt = buffBrain[id.y].paths[id.x].neuronInNum;
