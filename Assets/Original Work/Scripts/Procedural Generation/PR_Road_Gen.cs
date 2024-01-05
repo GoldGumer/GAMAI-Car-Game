@@ -8,7 +8,7 @@ using static UnityEditor.PlayerSettings;
 
 public class PR_Road_Gen : MonoBehaviour
 {
-    [SerializeField] GameObject roadShape;
+    [SerializeField] GameObject roadShapeStart, roadShapeMiddle;
     [SerializeField] int splineLength;
     [SerializeField] int roadPointCount;
     [SerializeField] Material roadMaterial;
@@ -55,16 +55,22 @@ public class PR_Road_Gen : MonoBehaviour
 
     private void UpdateMesh()
     {
-        List<Vector3> roadVertexList = roadShape.GetComponent<PR_Road_Segment>().GetVertexList();
-        List<int> roadQuadList = roadShape.GetComponent<PR_Road_Segment>().GetQuadList();
+        List<Vector3> roadVertexList = new List<Vector3>();
         List<int> roadTriangleList = new List<int>();
-
-        for (int i = 0; i < roadQuadList.Count; i += 4)
+        
+        for (int i = 0; i < roadArray.Length; i++)
         {
-            roadTriangleList.AddRange(QuadToTris(roadQuadList.ToArray()[i + 3], roadQuadList.ToArray()[i + 2], roadQuadList.ToArray()[i + 1], roadQuadList.ToArray()[i]));
+            roadVertexList.AddRange(roadArray[i].GetComponent<PR_Road_Segment>().GetVertexList());
+            List<int> roadQuadList = roadArray[i].GetComponent<PR_Road_Segment>().GetQuadList();
+            for (int j = 0; j < roadQuadList.Count; j += 4)
+            {
+                roadTriangleList.AddRange(QuadToTris(
+                    roadArray[i].GetComponent<PR_Road_Segment>().GetVertexList().Count * i + roadQuadList.ToArray()[j + 3],
+                    roadArray[i].GetComponent<PR_Road_Segment>().GetVertexList().Count * i + roadQuadList.ToArray()[j + 2],
+                    roadArray[i].GetComponent<PR_Road_Segment>().GetVertexList().Count * i + roadQuadList.ToArray()[j + 1],
+                    roadArray[i].GetComponent<PR_Road_Segment>().GetVertexList().Count * i + roadQuadList.ToArray()[j]));
+            }
         }
-
-
 
         roadMesh.GetComponent<MeshFilter>().mesh.Clear();
         roadMesh.GetComponent<MeshFilter>().mesh.vertices = roadVertexList.ToArray();
@@ -85,7 +91,18 @@ public class PR_Road_Gen : MonoBehaviour
                 float3 pos, tang, up;
                 roadSpline.GetComponent<SplineContainer>().Evaluate(((float)i) / ((float)roadPointCount), out pos, out tang, out up);
 
-                roadArray[i] = Instantiate(roadShape, pos, Quaternion.identity, transform);
+                if (i == 0)
+                {
+                    roadArray[i] = Instantiate(roadShapeStart, pos, Quaternion.identity, transform);
+                }
+                else if (i == roadPointCount - 1)
+                {
+                    roadArray[i] = Instantiate(roadShapeMiddle, pos, Quaternion.identity, transform);
+                }
+                else
+                {
+                    roadArray[i] = Instantiate(roadShapeMiddle, pos, Quaternion.identity, transform);
+                }
 
                 int childCount = roadArray[i].transform.childCount;
 
@@ -107,6 +124,32 @@ public class PR_Road_Gen : MonoBehaviour
                     {
                         roadArray[i].transform.GetChild(0).parent = endHalf.transform;
                     }
+                }
+            }
+            for (int i = 0; i < roadPointCount; i++)
+            {
+                if (i < roadPointCount - 1)
+                {
+                    roadArray[i].transform.GetChild(0).LookAt(roadArray[i + 1].transform.GetChild(0).position);
+                }
+                else
+                {
+                    roadArray[i].transform.GetChild(0).rotation = roadArray[i - 1].transform.GetChild(0).rotation;
+                }
+            }
+            for (int i = 0; i < roadPointCount; i++)
+            {
+                if (i < roadPointCount - 1)
+                {
+                    roadArray[i].transform.GetChild(1).position = roadArray[i + 1].transform.GetChild(0).position;
+                    roadArray[i].transform.GetChild(1).rotation = roadArray[i + 1].transform.GetChild(0).rotation;
+                }
+                else
+                {
+                    float3 pos, tang, up;
+                    roadSpline.GetComponent<SplineContainer>().Evaluate(1.0f, out pos, out tang, out up);
+                    roadArray[i].transform.GetChild(1).position = pos;
+                    roadArray[i].transform.GetChild(1).rotation = roadArray[i].transform.GetChild(0).rotation;
                 }
             }
         }

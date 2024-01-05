@@ -338,7 +338,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00ed1a8eb2a81f8409dea5b1cca8999f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  roadShape: {fileID: 1368184430499839093, guid: 6aa64b40b68c9eb4f94fc1283d86d7d7, type: 3}
+  roadShapeStart: {fileID: 1368184430499839093, guid: 6aa64b40b68c9eb4f94fc1283d86d7d7, type: 3}
+  roadShapeMiddle: {fileID: 1368184430499839093, guid: 4764aa64e2562514db157828e1c05da3, type: 3}
   splineLength: 5
   roadPointCount: 20
   roadMaterial: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
