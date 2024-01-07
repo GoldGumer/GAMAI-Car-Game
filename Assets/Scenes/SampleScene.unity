@@ -360,12 +360,8 @@ MonoBehaviour:
   splineLength: 5
   roadPointCount: 20
   roadMaterial: {fileID: 10303, guid: 0000000000000000f000000000000000, type: 0}
-  splinePoints:
-  - {x: 2.21, y: 0, z: 0}
-  - {x: -4.7, y: 4.11, z: 25}
-  - {x: 0.18, y: 0.22, z: 50}
-  - {x: 3.25, y: -5.27, z: 75}
-  - {x: -3.28, y: -8.34, z: 100}
+  randomness: 10
+  splinePoints: []
 --- !u!4 &1316080234
 Transform:
   m_ObjectHideFlags: 0

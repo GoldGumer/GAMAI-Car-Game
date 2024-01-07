@@ -1,11 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
 using UnityEngine.Splines;
-using static UnityEditor.PlayerSettings;
 
 public class PR_Road_Gen : MonoBehaviour
 {
@@ -13,7 +10,9 @@ public class PR_Road_Gen : MonoBehaviour
     [SerializeField] int splineLength;
     [SerializeField] int roadPointCount;
     [SerializeField] Material roadMaterial;
+    [SerializeField] float randomness;
     [SerializeField] Vector3[] splinePoints;
+
 
     GameObject[] roadArray;
     GameObject roadSpline;
@@ -25,20 +24,28 @@ public class PR_Road_Gen : MonoBehaviour
         roadSpline = new GameObject("Road Spline");
         roadSpline.transform.parent = transform;
         roadSpline.AddComponent<SplineContainer>();
-        if (splinePoints.Length != 0)
+
+        if (splinePoints.Length == 0)
         {
-            foreach (Vector3 point in splinePoints)
-            {
-                roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(point));
-            }
-        }
-        else
-        {
+            splinePoints = new Vector3[splineLength];
             for (int i = 0; i < splineLength; i++)
             {
-                roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(Vector3.forward * i * 25));
+                if (i == 0)
+                {
+                    splinePoints[i] = new Vector3(UnityEngine.Random.Range(-randomness, randomness), UnityEngine.Random.Range(-randomness, randomness), 25 * i);
+                }
+                else
+                {
+                    splinePoints[i] = new Vector3(splinePoints[i - 1].x + UnityEngine.Random.Range(-randomness, randomness), splinePoints[i - 1].y + UnityEngine.Random.Range(-randomness, randomness), 25 * i);
+                }
             }
         }
+
+        foreach (Vector3 point in splinePoints)
+        {
+            roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(point));
+        }
+
         roadSpline.GetComponent<SplineContainer>().Spline.SetTangentMode(TangentMode.AutoSmooth);
 
         roadMesh = new GameObject("Road Mesh");
@@ -60,9 +67,7 @@ public class PR_Road_Gen : MonoBehaviour
 
     private void Update()
     {
-        GenerateRoadSegments();
-        UpdateMesh();
-        DestroyRoadSegments();
+
     }
 
     private void UpdateMesh()
