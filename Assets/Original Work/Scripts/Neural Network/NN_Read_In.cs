@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class NN_Read_In : MonoBehaviour
 {
-    ComputeShader carBrain;
+    GameObject cars;
 
     // Start is called before the first frame update
     void Start()

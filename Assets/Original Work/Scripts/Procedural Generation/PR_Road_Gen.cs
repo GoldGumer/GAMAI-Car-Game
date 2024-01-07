@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using Unity.Mathematics;
 using UnityEngine;
@@ -12,6 +13,7 @@ public class PR_Road_Gen : MonoBehaviour
     [SerializeField] int splineLength;
     [SerializeField] int roadPointCount;
     [SerializeField] Material roadMaterial;
+    [SerializeField] Vector3[] splinePoints;
 
     GameObject[] roadArray;
     GameObject roadSpline;
@@ -23,9 +25,19 @@ public class PR_Road_Gen : MonoBehaviour
         roadSpline = new GameObject("Road Spline");
         roadSpline.transform.parent = transform;
         roadSpline.AddComponent<SplineContainer>();
-        for (int i = 0; i < splineLength; i++)
+        if (splinePoints.Length != 0)
         {
-            roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(Vector3.forward * i * 25));
+            foreach (Vector3 point in splinePoints)
+            {
+                roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(point));
+            }
+        }
+        else
+        {
+            for (int i = 0; i < splineLength; i++)
+            {
+                roadSpline.GetComponent<SplineContainer>().Spline.Add(new BezierKnot(Vector3.forward * i * 25));
+            }
         }
         roadSpline.GetComponent<SplineContainer>().Spline.SetTangentMode(TangentMode.AutoSmooth);
 
@@ -97,7 +109,7 @@ public class PR_Road_Gen : MonoBehaviour
                 }
                 else if (i == roadPointCount - 1)
                 {
-                    roadArray[i] = Instantiate(roadShapeMiddle, pos, Quaternion.identity, transform);
+                    roadArray[i] = Instantiate(roadShapeStart, pos, Quaternion.identity, transform);
                 }
                 else
                 {
@@ -151,7 +163,7 @@ public class PR_Road_Gen : MonoBehaviour
                     roadArray[i].transform.GetChild(1).position = pos;
                     roadArray[i].transform.GetChild(1).rotation = roadArray[i].transform.GetChild(0).rotation;
                 }
-            }
+            }   
         }
     }
 
@@ -177,5 +189,10 @@ public class PR_Road_Gen : MonoBehaviour
         ints.Add(c);
 
         return ints;
+    }
+
+    public Vector3[] GetSplinePoints()
+    {
+        return splinePoints;
     }
 }
