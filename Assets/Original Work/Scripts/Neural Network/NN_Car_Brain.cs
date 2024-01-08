@@ -4,8 +4,6 @@ using UnityEngine.Splines;
 using Unity.Mathematics;
 using UnityEngine;
 
-
-
 public class NN_Car_Brain : MonoBehaviour
 {
     static readonly int[] layerCounts = { 27, 7, 5 };
@@ -176,6 +174,11 @@ public class NN_Car_Brain : MonoBehaviour
 
     // Start is called before the first frame update
     void Awake()
+    {
+        GenerateNewBrain();
+    }
+
+    public void GenerateNewBrain()
     {
         carBrain = new Brain(layerCounts[0], layerCounts[1], layerCounts[2]);
         if (carBrain.neurons[0].bias == 0 && carBrain.paths[0].neuronInNum == carBrain.paths[0].neuronOutNum)
