@@ -1,0 +1,18 @@
+Road Generator
+script "PR_Road_Gen"
+ "road shape start" should have "road start" prefab equipped
+ "road shape middle" should have "road middle" prefab equipped
+ "spline length" can be any amount between 2 and infinity with for best result between 10-20 is best
+ "road material" should be unity's "Default-Material"
+ "randomness" is how far it can go in the x and y axis. This is using inclusive range
+ "spline points" keep at 0 length
+
+Cube
+script "Wall_Mover"
+
+Car AI Spawner
+script "NN_Car_Spawner"
+ "car" should be set to "Prometheus AI Variant"
+ "car amount" is however many cars you want to run
+ "generation length" is how long you want each generation is seconds
+ "generation count" is the current generation count
