@@ -44,8 +44,7 @@ public class NN_Car_Spawner : MonoBehaviour
             }
 
             Array.Sort(carTD, NN_Car_Brain.carTimeDistance.SortCarsByTime());
-            List<int> winnerCars = new List<int>();
-            List<int> loserCars = new List<int>();
+            List<NN_Car_Brain.carTimeDistance> winnerCars = new List<NN_Car_Brain.carTimeDistance>();
 
             if (carTD[0].isFinished)
             {
@@ -54,64 +53,40 @@ public class NN_Car_Spawner : MonoBehaviour
                 {
                     if (carTD[i].isFinished)
                     {
-                        winnerCars.Add(carTD[i].car);
+                        winnerCars.Add(carTD[i]);
                     }
                 }
             }
 
-            if (winnerCars.Count > carArray.Length / 2)
-            {
-                for (int i = 0; i < carArray.Length; i++)
-                {
-                    if (!winnerCars.Contains(carTD[i].car))
-                    {
-                        loserCars.Add(carTD[i].car);
-                    }
-                }
+            Array.Sort(carTD, NN_Car_Brain.carTimeDistance.SortCarsByDistance());
 
-                for (int i = 0; i < carArray.Length; i += 2)
-                {
-                    NN_Car_Brain.Brain[] newBrains = NN_Car_Brain.Brain.BreedBrains(carArray[winnerCars[i]].GetComponent<NN_Car_Brain>().GetBrain(), carArray[winnerCars[i + 1]].GetComponent<NN_Car_Brain>().GetBrain());
-                    carArray[loserCars[i]].GetComponent<NN_Car_Brain>().ReplaceBrain(newBrains[0]);
-                    carArray[loserCars[i + 1]].GetComponent<NN_Car_Brain>().ReplaceBrain(newBrains[1]);
-                    carArray[loserCars[i]].GetComponent<NN_Car_Brain>().SoftMutateBrain();
-                    carArray[loserCars[i + 1]].GetComponent<NN_Car_Brain>().SoftMutateBrain();
-                }
-            }
-            else
+            int j = 0;
+            while (winnerCars.Count < (carTD.Length / 2))
             {
-                Array.Sort(carTD, NN_Car_Brain.carTimeDistance.SortCarsByDistance());
-
-                for (int i = 0; i < carTD.Length; i++)
+                if (!winnerCars.Contains(carTD[j]))
                 {
-                    if (winnerCars.Count > carTD.Length / 2)
-                    {
-                        break;
-                    }
-                    else if (!winnerCars.Contains(carTD[i].car))
-                    {
-                        winnerCars.Add(carTD[i].car);
-                    }
+                    winnerCars.Add(carTD[j]);
                 }
+                j++;
             }
 
-            
+            List<NN_Car_Brain.carTimeDistance> loserCars = new List<NN_Car_Brain.carTimeDistance>();
 
-            for (int i = 0; i < carArray.Length; i++)
+            j = carTD.Length - 1;
+            while (loserCars.Count < (carTD.Length / 2))
             {
-                if (!winnerCars.Contains(i))
+                if (!winnerCars.Contains(carTD[j]))
                 {
-                    loserCars.Add(i);
+                    loserCars.Add(carTD[j]);
                 }
+                j--;
             }
 
-            for (int i = 0; i < carArray.Length; i += 2)
+            for (int i = 0; i < (carTD.Length / 2); i += 2)
             {
-                NN_Car_Brain.Brain[] newBrains = NN_Car_Brain.Brain.BreedBrains(carArray[winnerCars[i]].GetComponent<NN_Car_Brain>().GetBrain(), carArray[winnerCars[i + 1]].GetComponent<NN_Car_Brain>().GetBrain());
-                carArray[loserCars[i]].GetComponent<NN_Car_Brain>().ReplaceBrain(newBrains[0]);
-                carArray[loserCars[i + 1]].GetComponent<NN_Car_Brain>().ReplaceBrain(newBrains[1]);
-                carArray[loserCars[i]].GetComponent<NN_Car_Brain>().SoftMutateBrain();
-                carArray[loserCars[i + 1]].GetComponent<NN_Car_Brain>().SoftMutateBrain();
+                NN_Car_Brain.Brain[] brains = NN_Car_Brain.Brain.BreedBrains(carArray[winnerCars[i].car].GetComponent<NN_Car_Brain>().GetBrain(), carArray[winnerCars[i + 1].car].GetComponent<NN_Car_Brain>().GetBrain());
+                carArray[loserCars[i].car].GetComponent<NN_Car_Brain>().ReplaceBrain(brains[0]);
+                carArray[loserCars[i + 1].car].GetComponent<NN_Car_Brain>().ReplaceBrain(brains[1]);
             }
 
             if (isCarFinished)
