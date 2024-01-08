@@ -145,15 +145,15 @@ public class NN_Car_Spawner : MonoBehaviour
                     brain.neurons[id].bias = bias;
                 }
 
-                string pathwayDatat = reader.ReadLine();
-                string[] pathways = neuronData.Split("; ");
+                string pathwayData = reader.ReadLine();
+                string[] pathways = pathwayData.Split("; ");
                 foreach (var path in pathways)
                 {
                     string[] pathData = path.Split(", ");
                     int.TryParse(pathData[0], out int id);
                     int.TryParse(pathData[1], out int neuronInNum);
                     int.TryParse(pathData[2], out int neuronOutNum);
-                    int.TryParse(pathData[3], out int weight);
+                    float.TryParse(pathData[3], out float weight);
                     brain.paths[id].neuronInNum = neuronInNum;
                     brain.paths[id].neuronOutNum = neuronOutNum;
                     brain.paths[id].weight = weight;
@@ -219,6 +219,7 @@ public class NN_Car_Spawner : MonoBehaviour
         {
             carArray[i].transform.position = raycastHit.point + Vector3.up * 2;
             carArray[i].transform.rotation = Quaternion.identity;
+            carArray[i].GetComponent<Rigidbody>().velocity = Vector3.zero;
             carArray[i].GetComponent<NN_Car_Brain>().SoftMutateBrain();
         }
     }
