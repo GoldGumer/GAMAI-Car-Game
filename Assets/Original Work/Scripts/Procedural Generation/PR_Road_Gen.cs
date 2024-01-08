@@ -21,7 +21,7 @@ public class PR_Road_Gen : MonoBehaviour
     {
         roadPointCount = splineLength * 2;
 
-        roadArray = new GameObject[1];
+        roadArray = new GameObject[roadPointCount];
         roadSpline = new GameObject("Road Spline");
         roadSpline.transform.parent = transform;
         roadSpline.AddComponent<SplineContainer>();
@@ -31,7 +31,6 @@ public class PR_Road_Gen : MonoBehaviour
             splinePoints = new Vector3[splineLength];
         }
 
-        roadSpline.GetComponent<SplineContainer>().Spline.SetTangentMode(TangentMode.AutoSmooth);
         roadSpline.layer = 7;
 
         roadMesh = new GameObject("Road Mesh");
@@ -47,6 +46,7 @@ public class PR_Road_Gen : MonoBehaviour
         roadMesh.GetComponent<MeshRenderer>().material = roadMaterial;
 
         RegenerateRoad();
+        roadSpline.GetComponent<SplineContainer>().Spline.SetTangentMode(TangentMode.AutoSmooth);
     }
 
     private void Update()
@@ -109,7 +109,6 @@ public class PR_Road_Gen : MonoBehaviour
     {
         if (roadArray[0] == null)
         {
-            roadArray = new GameObject[roadPointCount];
             for (int i = 0; i < roadPointCount; i++)
             {
                 float3 pos, tang, up;
@@ -150,32 +149,42 @@ public class PR_Road_Gen : MonoBehaviour
                     }
                 }
             }
+        }
+        else
+        {
             for (int i = 0; i < roadPointCount; i++)
             {
-                if (i < roadPointCount - 1)
-                {
-                    roadArray[i].transform.GetChild(0).LookAt(roadArray[i + 1].transform.GetChild(0).position);
-                }
-                else
-                {
-                    roadArray[i].transform.GetChild(0).rotation = roadArray[i - 1].transform.GetChild(0).rotation;
-                }
+                float3 pos, tang, up;
+                roadSpline.GetComponent<SplineContainer>().Evaluate(((float)i) / ((float)roadPointCount), out pos, out tang, out up);
+                roadArray[i].transform.position = pos;
             }
-            for (int i = 0; i < roadPointCount; i++)
+
+        }
+        for (int i = 0; i < roadPointCount; i++)
+        {
+            if (i < roadPointCount - 1)
             {
-                if (i < roadPointCount - 1)
-                {
-                    roadArray[i].transform.GetChild(1).position = roadArray[i + 1].transform.GetChild(0).position;
-                    roadArray[i].transform.GetChild(1).rotation = roadArray[i + 1].transform.GetChild(0).rotation;
-                }
-                else
-                {
-                    float3 pos, tang, up;
-                    roadSpline.GetComponent<SplineContainer>().Evaluate(1.0f, out pos, out tang, out up);
-                    roadArray[i].transform.GetChild(1).position = pos;
-                    roadArray[i].transform.GetChild(1).rotation = roadArray[i].transform.GetChild(0).rotation;
-                }
-            }   
+                roadArray[i].transform.GetChild(0).LookAt(roadArray[i + 1].transform.GetChild(0).position);
+            }
+            else
+            {
+                roadArray[i].transform.GetChild(0).rotation = roadArray[i - 1].transform.GetChild(0).rotation;
+            }
+        }
+        for (int i = 0; i < roadPointCount; i++)
+        {
+            if (i < roadPointCount - 1)
+            {
+                roadArray[i].transform.GetChild(1).position = roadArray[i + 1].transform.GetChild(0).position;
+                roadArray[i].transform.GetChild(1).rotation = roadArray[i + 1].transform.GetChild(0).rotation;
+            }
+            else
+            {
+                float3 pos, tang, up;
+                roadSpline.GetComponent<SplineContainer>().Evaluate(1.0f, out pos, out tang, out up);
+                roadArray[i].transform.GetChild(1).position = pos;
+                roadArray[i].transform.GetChild(1).rotation = roadArray[i].transform.GetChild(0).rotation;
+            }
         }
     }
 
